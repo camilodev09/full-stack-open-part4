@@ -1,0 +1,35 @@
+### ===================================================================
+### BLOG LISTS API - INTEGRATION TESTING (REST CLIENT)
+### ===================================================================
+
+### 1. GET all blogs (Verifica la conexión y recuperación de la colección)
+GET http://localhost:3001/api/blogs
+
+
+### ===================================================================
+
+
+### 2. POST a new blog (Verifica el parseo de req.body y el guardado en Atlas)
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Architecting Enterprise Node.js Backends",
+  "author": "Camilo Bautista",
+  "url": "https://www.creazone.pe/blog/enterprise-backend",
+  "likes": 15
+}
+
+
+### ===================================================================
+
+
+### 3. POST another blog (Verifica el comportamiento del default de likes)
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Clean Architecture Patterns in Full Stack Open",
+  "author": "Helsinki Tech Lead",
+  "url": "https://fullstackopen.com/"
+}
