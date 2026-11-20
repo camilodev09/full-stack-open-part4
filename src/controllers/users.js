@@ -1,0 +1,37 @@
+const bcrypt = require('bcrypt') 
+const User = require('../models/user')
+
+const getUsers = async (req, res, next) => {
+  try {
+    const users = await User.find({})
+    res.json(users)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const createUsers = async (req, res, next) => {
+  try {
+    const { username, name, password, id } = req.body
+
+    const saltRounds = 10
+    const passwordHash = await bcrypt.hash(password, saltRounds)
+
+    const user = new User({
+      username,
+      name,
+      passwordHash,
+      id,
+    })
+
+    const savedUser = await user.save()
+    res.status(201).json(savedUser)
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = {
+  getUsers,
+  createUsers,
+}

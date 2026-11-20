@@ -5,6 +5,8 @@ require('./utils/db')
 const morgan = require('morgan')
 const Blog = require('./models/blog')
 const blogsRouter = require('./routes/blogs')
+const usersRouter = require('./routes/users')
+
 
 const app = express()
 
@@ -30,5 +32,6 @@ app.get('/', (req,res)=>{
 
 //Mount Modular Router Gateway
 app.use('/api/blogs', blogsRouter)
+app.use('/api/users', usersRouter)
 
 module.exports = app
