@@ -1,12 +1,17 @@
 
 const Blog = require('../models/blog')
+const User = require('../models/user')
+
 
 //Get Blogs
 
 const getBlogs = async (req,res, next) => {
 
   try{
-    const blogs = await Blog.find({})
+    const blogs = await Blog.find({}).populate('users',{
+      username: 1,
+      name: 1,
+    })
     res.json(blogs)
   }
   
@@ -27,14 +32,26 @@ const createBlog = async (req, res, next) => {
       return res.status(400).json({ error: 'title or url missing' })
     }
 
+    // Exercise 4.17: assign first available user as creator
+    const user =   await User.findOne({})
+    if(!user) {
+      return res.status(400).json({error: 'no user found in DB'})
+    }
+
     const blog = new Blog({
       title: body.title,
       author: body.author,
       url: body.url,
-      likes: body.likes === undefined ? 0 : body.likes
+      user: user._id, 
+      likes: body.likes === undefined ? 0 : body.likes,
+    
     })
 
     const savedBlog = await blog.save()
+
+    user.blogs = user.blogs.concat(savedBlog._id)
+    await user.save()
+
     res.status(201).json(savedBlog)
   } catch (error) {
     next(error)

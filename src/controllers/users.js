@@ -1,9 +1,13 @@
-const bcrypt = require('bcrypt') 
+const bcrypt = require('bcryptjs') 
 const User = require('../models/user')
 
 const getUsers = async (req, res, next) => {
   try {
-    const users = await User.find({})
+    const users = await User.find({}).populate('blogs',{
+      url: 1,
+      title: 1,
+      author: 1,
+    })
     res.json(users)
   } catch (error) {
     next(error)
@@ -14,6 +18,13 @@ const createUsers = async (req, res, next) => {
   try {
     const { username, name, password} = req.body
 
+    if(!password || password.length < 3){
+      return res.status(400).json({
+        error:'password must be provided at least 3 characters long'
+      })
+    }
+
+
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(password, saltRounds)
 
@@ -22,7 +33,7 @@ const createUsers = async (req, res, next) => {
       name,
       passwordHash,
      
-    })
+    })  
 
     const savedUser = await user.save()
     res.status(201).json(savedUser)
