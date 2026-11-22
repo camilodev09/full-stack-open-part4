@@ -6,6 +6,7 @@ const morgan = require('morgan')
 const Blog = require('./models/blog')
 const blogsRouter = require('./routes/blogs')
 const usersRouter = require('./routes/users')
+const loginRouter = require('./routes/login')
 
 
 const app = express()
@@ -26,12 +27,13 @@ app.use(morgan( ' :method :url :status :res[content-lenght] - :response-time ms 
 app.get('/', (req,res)=>{
   res.send('<h1> BLOG LISTS </h1>')
 })
-
+ 
 //Info Endpoint
 
 
 //Mount Modular Router Gateway
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
 
 module.exports = app
