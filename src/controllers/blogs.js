@@ -4,12 +4,8 @@ const User = require('../models/user')
 const config = require('../utils/config')
 
 //1. getTokenFrom(req) lee el header Authorization
-const getTokenFrom = (req) => {
-  const authorization = req.get('authorization')
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '')
-  }
-  return null
+if (!req.token) {
+  return res.status(401).json({ error: 'token invalid' })
 }
 
 // Get Blogs
@@ -36,7 +32,12 @@ const createBlog = async (req, res, next) => {
     }
 
     // Exercise 4.18 & 4.19: Verify JWT and resolve authenticated user
-    const decodedToken = jwt.verify(getTokenFrom(req), config.SECRET)
+    const token = getTokenFrom(req)
+    if (!token) {
+      return res.status(401).json({ error: 'token invalid' })
+    }
+
+    const decodedToken = jwt.verify(req.token, config.SECRET)
     if (!decodedToken.id) {
       return res.status(401).json({ error: 'token invalid' })
     }

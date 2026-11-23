@@ -8,6 +8,8 @@ const blogsRouter = require('./routes/blogs')
 const usersRouter = require('./routes/users')
 const loginRouter = require('./routes/login')
 
+const { errorHandler, tokenExtractor } = require('./utils/middlewares')
+
 
 const app = express()
 
@@ -15,6 +17,7 @@ const app = express()
 app.use(express.static('dist'))
 app.use(cors())
 app.use(express.json()) // Essential parser middleware to populate req.body
+app.use(tokenExtractor) //req.token/middlewares.js   ejercise.4.21
 
 //custom morgan
 morgan.token( 'body', (req)=>{
@@ -35,5 +38,7 @@ app.get('/', (req,res)=>{
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
+
+app.use(errorHandler)
 
 module.exports = app
