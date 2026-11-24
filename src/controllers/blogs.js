@@ -3,10 +3,7 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 const config = require('../utils/config')
 
-//1. getTokenFrom(req) lee el header Authorization
-if (!req.token) {
-  return res.status(401).json({ error: 'token invalid' })
-}
+
 
 // Get Blogs
 const getBlogs = async (req, res, next) => {
@@ -31,21 +28,8 @@ const createBlog = async (req, res, next) => {
       return res.status(400).json({ error: 'title or url missing' })
     }
 
-    // Exercise 4.18 & 4.19: Verify JWT and resolve authenticated user
-    const token = getTokenFrom(req)
-    if (!token) {
-      return res.status(401).json({ error: 'token invalid' })
-    }
-
-    const decodedToken = jwt.verify(req.token, config.SECRET)
-    if (!decodedToken.id) {
-      return res.status(401).json({ error: 'token invalid' })
-    }
-
-    const user = await User.findById(decodedToken.id)
-    if (!user) {
-      return res.status(401).json({ error: 'user not found' })
-    }
+    // Resuelto previamente por userExtractor
+    const user = req.user
 
     const blog = new Blog({
       title: body.title,
@@ -69,6 +53,16 @@ const createBlog = async (req, res, next) => {
 // Delete (Exercise 4.13)
 const deleteBlog = async (req, res, next) => {
   try {
+    const blog = await Blog.findById(req.params.id)
+    if (!blog) {
+      return res.status(404).end()
+    }
+
+    // Solo el creador del blog puede eliminarlo
+    if (blog.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ error: 'only the creator can delete a blog' })
+    }
+
     await Blog.findByIdAndDelete(req.params.id)
     res.status(204).end()
   } catch (error) {
